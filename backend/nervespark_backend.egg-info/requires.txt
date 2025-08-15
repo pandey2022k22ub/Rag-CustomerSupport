@@ -1,0 +1,6 @@
+pymongo
+transformers
+torch
+pytest
+flask
+flask-cors

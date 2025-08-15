@@ -1,0 +1,10 @@
+Metadata-Version: 2.4
+Name: nervespark-backend
+Version: 0.1
+Requires-Dist: pymongo
+Requires-Dist: transformers
+Requires-Dist: torch
+Requires-Dist: pytest
+Requires-Dist: flask
+Requires-Dist: flask-cors
+Dynamic: requires-dist
