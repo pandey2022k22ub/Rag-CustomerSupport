@@ -1,25 +1,27 @@
-# services/escalation_services.py
-from sklearn.linear_model import LogisticRegression
-import numpy as np
-import joblib
-import os
+import logging
 
-MODEL_PATH = "models/escalation_model.pkl"
+# This is a placeholder for a real machine learning model.
+# In a real application, you would load a trained classifier here.
+# For example: from sklearn.externals import joblib
+# classifier = joblib.load('escalation_model.pkl')
 
-def train_escalation_model(training_data, labels):
-    """Train a simple escalation prediction model."""
-    model = LogisticRegression()
-    model.fit(training_data, labels)
-
-    os.makedirs("models", exist_ok=True)
-    joblib.dump(model, MODEL_PATH)
-    return {"message": "Escalation model trained successfully"}
-
-def predict_escalation(features):
-    """Predict escalation risk score."""
-    if not os.path.exists(MODEL_PATH):
-        return {"error": "Model not trained"}
-
-    model = joblib.load(MODEL_PATH)
-    prob = model.predict_proba([features])[0][1]  # probability of escalation
-    return {"escalation_risk": round(prob, 2), "needs_escalation": prob > 0.7}
+# This is the 'predict' function that was missing.
+async def predict(text: str, history: list = None) -> dict:
+    """
+    Predicts the likelihood of a conversation needing escalation.
+    This is a simple keyword-based placeholder.
+    """
+    logging.info(f"[Escalation Service] Predicting escalation for text: '{text}'")
+    
+    text_lower = text.lower()
+    escalation_keywords = [
+        "manager", "supervisor", "complaint", "refund", "cancel my account",
+        "legal", "lawyer", "sue", "frustrated", "angry", "unacceptable"
+    ]
+    
+    # Check if any keywords are present
+    if any(keyword in text_lower for keyword in escalation_keywords):
+        logging.warning(f"[Escalation Service] Escalation detected based on keywords.")
+        return {"prediction": "escalation", "confidence": 0.9}
+        
+    return {"prediction": "no_escalation", "confidence": 0.8}

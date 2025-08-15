@@ -1,24 +1,26 @@
-# services/rag_services.py
+import logging
 from services.article_service import search_articles
-from services.sentiment_service import detect_sentiment
+# This is the corrected import. It now calls the 'analyze' function.
+from services.sentiment_service import analyze as analyze_sentiment
 from utils.llm_utils import generate_response
 
-def rag_query(user_query: str):
-    """RAG pipeline: retrieve + sentiment + generate empathetic response."""
-    # Step 1: Retrieve relevant articles
-    articles = search_articles(user_query)
-
-    # Step 2: Analyze sentiment
-    sentiment_result = detect_sentiment(user_query)
-
-    # Step 3: Prepare context for LLM
-    context = "\n\n".join([f"{a['title']}: {a['content']}" for a in articles])
-
-    # Step 4: Generate empathetic response
-    response = generate_response(user_query, context, sentiment_result["label"])
-
-    return {
-        "retrieved_articles": articles,
-        "sentiment": sentiment_result,
-        "ai_response": response
-    }
+async def generate_answer(query: str, sources: list, sentiment: dict, tone: str = None):
+    """
+    This function runs the full RAG pipeline.
+    """
+    logging.info("--- [RAG Service] Starting RAG pipeline ---")
+    
+    # The context is prepared from the sources passed in from the chat route
+    context = "\n\n".join([f"Title: {s.get('title', '')}\nContent: {s.get('snippet', '')}" for s in sources])
+    
+    try:
+        # Call the llm_utils function that connects to the Gemini API
+        response_text = generate_response(
+            user_query=query, 
+            context=context, 
+            sentiment_label=sentiment.get("label", "neutral")
+        )
+        return response_text
+    except Exception as e:
+        logging.error(f"--- [RAG Service] ERROR during LLM call: {e}", exc_info=True)
+        return "I'm sorry, but I encountered an error trying to generate a response."
